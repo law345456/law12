@@ -97,10 +97,19 @@
 
         .delete-btn { margin-left: 10px; background-color: red; }
 
+        /* إخفاء الزر الخاص بالمسؤول */
+        #adminSaveBtn {
+            display: none;
+        }
+
+        /* عرض الزر فقط للمسؤول */
+        .admin #adminSaveBtn {
+            display: inline-block;
+        }
     </style>
 </head>
 
-<body>
+<body class="admin"> <!-- إضافة class "admin" لعرض الزر -->
     <header>
         <h1>مرحبًا بكم في موقعي</h1>
     </header>
@@ -117,6 +126,7 @@
             <button id="clearListBtn" class="admin-only">مسح القائمة</button>
             <button id="reverseListBtn" class="admin-only">عكس الترتيب</button>
             <button id="saveListBtn">حفظ القائمة</button>
+            <button id="adminSaveBtn">حفظ التغييرات (مسؤول)</button> <!-- زر الحفظ الخاص بالمسؤول -->
             <ul id="myList"></ul>
         </section>
         <button id="toggleCommentSection">إظهار/إخفاء التعليقات</button>
@@ -136,7 +146,7 @@
         const user = {
             name: navigator.userAgent ? 'المستخدم' : '',
             avatar: navigator.userAgent ? 'https://via.placeholder.com/40' : '',
-            isAdmin: true
+            isAdmin: true // يمكن تغيير هذه القيمة بناءً على صلاحيات المستخدم
         };
 
         document.querySelectorAll('.admin-only').forEach(button => {
@@ -180,6 +190,18 @@
 
         document.getElementById('toggleCommentSection').addEventListener('click', function () {
             commentSection.classList.toggle('active');
+        });
+
+        // دالة لحفظ التغييرات
+        document.getElementById('adminSaveBtn').addEventListener('click', function () {
+            const listItems = Array.from(listElement.children).map(li => li.textContent);
+            const comments = Array.from(commentList.children).map(li => li.textContent);
+
+            // يمكنك هنا إرسال البيانات إلى الخادم أو حفظها في localStorage
+            localStorage.setItem('savedList', JSON.stringify(listItems));
+            localStorage.setItem('savedComments', JSON.stringify(comments));
+
+            alert('تم حفظ التغييرات بنجاح!');
         });
     </script>
 </body>
