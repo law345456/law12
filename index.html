@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقعي الأول</title>
+    <meta name="robots" content="index, follow">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1a1a2e;
+            color: #eaeaea;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            pointer-events: none;
+        }
+
+        a, img, input[type="text"], textarea, button {
+            pointer-events: auto;
+        }
+
+        header {
+            padding: 20px;
+            background: linear-gradient(90deg, #3a0ca3, #7209b7);
+            color: white;
+            font-size: 2rem;
+            animation: fadeIn 2s ease-in-out, textGlow 2s infinite alternate;
+        }
+
+        button {
+            background-color: #3a0ca3;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 0 10px rgba(114, 9, 183, 0.5);
+        }
+
+        button:hover {
+            background-color: #7209b7;
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 20px rgba(114, 9, 183, 0.8);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #2a2a72;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        img {
+            max-width: 200px;
+            margin: 10px auto;
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes textGlow {
+            0% { text-shadow: 0 0 5px #7209b7, 0 0 10px #3a0ca3, 0 0 15px #7209b7; }
+            100% { text-shadow: 0 0 10px #3a0ca3, 0 0 20px #7209b7, 0 0 30px #3a0ca3; }
+        }
+
+        #output { margin-top: 20px; font-size: 1.2rem; color: #f72585; }
+
+        .input-field { margin: 10px 0; padding: 5px; }
+
+        #saveListBtn { display: none; }
+
+        .hidden { display: none; }
+
+        li.fadeIn { animation: slideIn 0.5s ease-in-out; }
+
+        #commentSection { display: none; opacity: 0; transition: opacity 0.5s ease-in-out; }
+
+        #commentSection.active { display: block; opacity: 1; }
+
+        .delete-btn { margin-left: 10px; background-color: red; }
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>مرحبًا بكم في موقعي</h1>
+    </header>
+    <main>
+        <section>
+            <button id="showMessageBtn">عرض رسالة</button>
+            <p id="output"></p>
+        </section>
+        <section>
+            <h2>القائمة</h2>
+            <input type="text" id="itemName" class="input-field" placeholder="اسم العنصر">
+            <input type="text" id="itemImage" class="input-field" placeholder="رابط الصورة (اختياري)">
+            <button id="addItemBtn" class="admin-only">إضافة عنصر</button>
+            <button id="clearListBtn" class="admin-only">مسح القائمة</button>
+            <button id="reverseListBtn" class="admin-only">عكس الترتيب</button>
+            <button id="saveListBtn">حفظ القائمة</button>
+            <ul id="myList"></ul>
+        </section>
+        <button id="toggleCommentSection">إظهار/إخفاء التعليقات</button>
+        <section id="commentSection">
+            <h2>التعليقات</h2>
+            <input type="text" id="commentInput" class="input-field" placeholder="أضف تعليقك هنا">
+            <button id="addCommentBtn">إضافة تعليق</button>
+            <ul id="commentList"></ul>
+        </section>
+    </main>
+
+    <script>
+        const listElement = document.getElementById('myList');
+        const commentSection = document.getElementById('commentSection');
+        const commentInput = document.getElementById('commentInput');
+        const commentList = document.getElementById('commentList');
+        const user = {
+            name: navigator.userAgent ? 'المستخدم' : '',
+            avatar: navigator.userAgent ? 'https://via.placeholder.com/40' : '',
+            isAdmin: true
+        };
+
+        document.querySelectorAll('.admin-only').forEach(button => {
+            if (!user.isAdmin) {
+                button.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('addItemBtn').addEventListener('click', function () {
+            const itemName = document.getElementById('itemName').value;
+            const itemImage = document.getElementById('itemImage').value;
+            if (itemName) {
+                const li = document.createElement('li');
+                li.classList.add('fadeIn');
+                li.textContent = itemName;
+                if (itemImage) {
+                    const img = document.createElement('img');
+                    img.src = itemImage;
+                    li.prepend(img);
+                }
+                listElement.appendChild(li);
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemImage').value = '';
+            }
+        });
+
+        document.getElementById('addCommentBtn').addEventListener('click', function () {
+            const commentText = commentInput.value;
+            if (commentText && user.name) {
+                const li = document.createElement('li');
+                li.innerHTML = `<img src="${user.avatar}" alt="avatar" width="40"> <strong>${user.name}:</strong> ${commentText} <button class="delete-btn">حذف</button>`;
+                commentList.appendChild(li);
+                commentInput.value = '';
+                li.querySelector('.delete-btn').addEventListener('click', function() {
+                    if (user.name === 'المستخدم') {
+                        li.remove();
+                    }
+                });
+            }
+        });
+
+        document.getElementById('toggleCommentSection').addEventListener('click', function () {
+            commentSection.classList.toggle('active');
+        });
+    </script>
+</body>
+
+</html>
